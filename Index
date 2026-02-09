@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Flujo Operativo - Programadores</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg1:#0b1220;
+      --bg2:#0f1b33;
+      --card:rgba(255,255,255,.06);
+      --card2:rgba(255,255,255,.09);
+      --border:rgba(255,255,255,.12);
+      --text:#eaf0ff;
+      --muted:rgba(234,240,255,.72);
+      --line:rgba(234,240,255,.16);
+
+      --c-teal:#38f2c4;
+      --c-blue:#5aa8ff;
+      --c-violet:#a78bfa;
+      --c-amber:#ffcc66;
+      --c-rose:#ff6b9a;
+      --c-lime:#b6ff6a;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 10%, rgba(90,168,255,.22), transparent 55%),
+        radial-gradient(1000px 650px at 80% 20%, rgba(167,139,250,.22), transparent 55%),
+        radial-gradient(1100px 650px at 30% 85%, rgba(56,242,196,.18), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      min-height:100vh;
+      padding:40px 18px;
+    }
+
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+    }
+
+    .header{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
+    }
+
+    .title{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .title h1{
+      font-size:28px;
+      line-height:1.15;
+      margin:0;
+      letter-spacing:-0.02em;
+    }
+
+    .title p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .pill{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 14px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.05));
+      border-radius:999px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 18px 50px rgba(0,0,0,.35);
+      white-space:nowrap;
+    }
+
+    .pill b{font-weight:700}
+    .pill span{color:var(--muted); font-size:13px}
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap:16px;
+    }
+
+    @media (max-width: 920px){
+      .grid{grid-template-columns:1fr}
+      .pill{justify-content:center}
+      .header{flex-direction:column; align-items:flex-start}
+    }
+
+    .card{
+      border:1px solid var(--border);
+      border-radius:18px;
+      background:linear-gradient(180deg, var(--card2), var(--card));
+      backdrop-filter: blur(12px);
+      box-shadow: 0 18px 60px rgba(0,0,0,.40);
+      overflow:hidden;
+    }
+
+    .card .card-head{
+      padding:16px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+
+    .card .card-head h2{
+      margin:0;
+      font-size:15px;
+      letter-spacing:.02em;
+      text-transform:uppercase;
+      color:rgba(234,240,255,.85);
+    }
+
+    .badge{
+      font-size:12px;
+      color:rgba(234,240,255,.78);
+      border:1px solid rgba(234,240,255,.14);
+      background:rgba(0,0,0,.14);
+      padding:6px 10px;
+      border-radius:999px;
+    }
+
+    /* Timeline */
+    .timeline{
+      position:relative;
+      padding:18px 18px 20px 18px;
+    }
+
+    .timeline::before{
+      content:"";
+      position:absolute;
+      left:34px;
+      top:18px;
+      bottom:20px;
+      width:2px;
+      background:linear-gradient(180deg, rgba(90,168,255,.55), rgba(167,139,250,.45), rgba(56,242,196,.35));
+      opacity:.8;
+      border-radius:2px;
+    }
+
+    .item{
+      display:grid;
+      grid-template-columns: 44px 1fr;
+      gap:14px;
+      padding:12px 0;
+      position:relative;
+    }
+
+    .dot{
+      width:34px;
+      height:34px;
+      border-radius:12px;
+      display:grid;
+      place-items:center;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      box-shadow: 0 10px 25px rgba(0,0,0,.35);
+      position:relative;
+      z-index:1;
+      margin-left:17px; /* centers on the line */
+      transform: translateX(-17px);
+    }
+
+    .dot::after{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      border-radius:12px;
+      background: radial-gradient(circle at 20% 15%, rgba(255,255,255,.26), transparent 45%);
+      pointer-events:none;
+    }
+
+    .emoji{
+      font-size:16px;
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,.35));
+    }
+
+    .content{
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.14);
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .topline{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .name{
+      font-weight:700;
+      letter-spacing:-0.01em;
+    }
+    .desc{
+      color:var(--muted);
+      font-size:13px;
+      margin-top:2px;
+    }
+
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      justify-content:flex-end;
+    }
+
+    .chip{
+      font-size:12px;
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color:rgba(234,240,255,.90);
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+
+    .chip b{font-weight:700}
+    .chip small{opacity:.85}
+
+    .accent-teal{ box-shadow: 0 0 0 1px rgba(56,242,196,.25) inset; }
+    .accent-blue{ box-shadow: 0 0 0 1px rgba(90,168,255,.25) inset; }
+    .accent-violet{ box-shadow: 0 0 0 1px rgba(167,139,250,.25) inset; }
+    .accent-amber{ box-shadow: 0 0 0 1px rgba(255,204,102,.25) inset; }
+    .accent-rose{ box-shadow: 0 0 0 1px rgba(255,107,154,.25) inset; }
+    .accent-lime{ box-shadow: 0 0 0 1px rgba(182,255,106,.25) inset; }
+
+    /* Side panel: schedule bands */
+    .bands{
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .band{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.14);
+      border-radius:16px;
+      overflow:hidden;
+    }
+
+    .band .band-head{
+      padding:12px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      border-bottom:1px solid rgba(255,255,255,.07);
+    }
+
+    .band .band-head .left{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:700;
+    }
+
+    .bar{
+      height:6px;
+      background:linear-gradient(90deg, rgba(90,168,255,.7), rgba(167,139,250,.65), rgba(56,242,196,.55));
+    }
+
+    .band .band-body{
+      padding:12px 14px 14px;
+      color:var(--muted);
+      font-size:13px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .ticks{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .tick{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px dashed rgba(234,240,255,.18);
+      background: rgba(255,255,255,.04);
+      color:rgba(234,240,255,.88);
+      font-size:12px;
+    }
+
+    .tick i{
+      width:8px;
+      height:8px;
+      border-radius:99px;
+      display:inline-block;
+      background: var(--c-blue);
+      box-shadow:0 0 0 4px rgba(90,168,255,.12);
+    }
+
+    .tick.teal i{ background: var(--c-teal); box-shadow:0 0 0 4px rgba(56,242,196,.12);}
+    .tick.violet i{ background: var(--c-violet); box-shadow:0 0 0 4px rgba(167,139,250,.12);}
+    .tick.amber i{ background: var(--c-amber); box-shadow:0 0 0 4px rgba(255,204,102,.12);}
+    .tick.rose i{ background: var(--c-rose); box-shadow:0 0 0 4px rgba(255,107,154,.12);}
+    .tick.lime i{ background: var(--c-lime); box-shadow:0 0 0 4px rgba(182,255,106,.12);}
+
+    .footer-note{
+      margin-top:14px;
+      color:rgba(234,240,255,.60);
+      font-size:12px;
+      text-align:center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="header">
+      <div class="title">
+        <h1>Flujo Operativo Diario</h1>
+        <p>Resumen visual de programadores, flujos y automatizaciones (horarios y dependencias).</p>
+      </div>
+
+      <div class="pill">
+        <b>⏱️ Nómina PyC</b>
+        <span>Inicio 10:01</span>
+      </div>
+    </div>
+
+    <div class="grid">
+
+      <!-- TIMELINE -->
+      <section class="card">
+        <div class="card-head">
+          <h2>Timeline del flujo</h2>
+          <span class="badge">Estado: Programado</span>
+        </div>
+
+        <div class="timeline">
+
+          <div class="item">
+            <div class="dot"><span class="emoji">🕗</span></div>
+            <div class="content">
+              <div class="topline">
+                <div>
+                  <div class="name">Programador de Tareas</div>
+                  <div class="desc">Ejecuciones múltiples + envío de email operativo.</div>
+                </div>
+                <div class="chips">
+                  <span class="chip accent-blue">🕘 <b>09:41</b></span>
+                  <span class="chip accent-violet">🕛 <b>12:10</b></span>
+                  <span class="chip accent-teal">🕒 <b>12:14</b><small>Examenes</small></span>
+				  <span class="chip accent-amber">✉️ <b>12:10</b> <small>Envío Email</small></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="item">
+            <div class="dot"><span class="emoji">🕗</span></div>
+            <div class="content">
+              <div class="topline">
+                <div>
+                  <div class="name">Programador — BASE ICEP</div>
+                  <div class="desc">Base + planilla de exámenes + actualización del Dashboard ICEP.</div>
+                </div>
+                <div class="chips">
+                  <span class="chip accent-blue">🕘 <b>09:00</b> <small>Base</small></span>
+                  <span class="chip accent-violet">📄 <b>09:04</b> <small>Planilla Exámenes</small></span>
+                  <span class="chip accent-teal">📊 <b>09:30</b> <small>DashICEP</small></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="item">
+            <div class="dot"><span class="emoji">🔄</span></div>
+            <div class="content">
+              <div class="topline">
+                <div>
+                  <div class="name">Flujo de datos</div>
+                  <div class="desc">Ciclos de actualización a lo largo del día.</div>
+                </div>
+                <div class="chips">
+                  <span class="chip accent-blue">🕘 <b>09:00</b></span>
+                  <span class="chip accent-violet">🕛 <b>12:00</b></span>
+                  <span class="chip accent-teal">🕒 <b>14:30</b></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="item">
+            <div class="dot"><span class="emoji">📊</span></div>
+            <div class="content">
+              <div class="topline">
+                <div>
+                  <div class="name">Modelo de datos</div>
+                  <div class="desc">Procesamiento posterior (latencia controlada).</div>
+                </div>
+                <div class="chips">
+                  <span class="chip accent-blue">🕤 <b>09:30</b></span>
+                  <span class="chip accent-violet">🕧 <b>12:30</b></span>
+                  <span class="chip accent-teal">🕞 <b>15:00</b></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="item">
+            <div class="dot"><span class="emoji">📌</span></div>
+            <div class="content">
+              <div class="topline">
+                <div>
+                  <div class="name">Programador Estado</div>
+                  <div class="desc">Actualización de estado / consistencia de información.</div>
+                </div>
+                <div class="chips">
+                  <span class="chip accent-lime">✅ <b>09:41</b></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="item">
+            <div class="dot"><span class="emoji">🧩</span></div>
+            <div class="content">
+              <div class="topline">
+                <div>
+                  <div class="name">Automate Unifica</div>
+                  <div class="desc">Consolidación automática / unificación de fuentes.</div>
+                </div>
+                <div class="chips">
+                  <span class="chip accent-rose">🧩 <b>09:42</b></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="item">
+            <div class="dot"><span class="emoji">⚙️</span></div>
+            <div class="content">
+              <div class="topline">
+                <div>
+                  <div class="name">Power Automate</div>
+                  <div class="desc">Ejecuciones y automatizaciones orquestadas.</div>
+                </div>
+                <div class="chips">
+                  <span class="chip accent-amber">⚙️ <b>10:00</b></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SIDE: RESUMEN DE BANDAS -->
+      <aside class="card">
+        <div class="card-head">
+          <h2>Ventanas de ejecución</h2>
+          <span class="badge">Control por horario</span>
+        </div>
+
+        <div class="bands">
+
+          <div class="band">
+            <div class="bar"></div>
+            <div class="band-head">
+              <div class="left">⏱️ Nómina PyC</div>
+              <div class="badge">Inicio 10:01</div>
+            </div>
+            <div class="band-body">
+              Flujo propio del proceso de PyC.
+              <div class="ticks">
+                <span class="tick teal"><i></i> 10:01</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="band">
+            <div class="bar"></div>
+            <div class="band-head">
+              <div class="left">🕗 Programadores</div>
+              <div class="badge">Múltiples</div>
+            </div>
+            <div class="band-body">
+              Ejecuciones automáticas de tareas críticas (Ausentismo / ICEP).
+              <div class="ticks">
+                <span class="tick"><i></i> 08:49</span>
+                <span class="tick violet"><i></i> 09:00</span>
+                <span class="tick amber"><i></i> 09:04</span>
+                <span class="tick teal"><i></i> 09:30</span>
+                <span class="tick lime"><i></i> 09:43</span>
+                <span class="tick rose"><i></i> 09:48</span>
+                <span class="tick amber"><i></i> 10:00</span>
+                <span class="tick amber"><i></i> 11:00 (Email)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="band">
+            <div class="bar"></div>
+            <div class="band-head">
+              <div class="left">🔄 Datos → 📊 Modelo</div>
+              <div class="badge">Ciclos</div>
+            </div>
+            <div class="band-body">
+              Ventanas de refresco y procesamiento posterior.
+              <div class="ticks">
+                <span class="tick"><i></i> 09:00 → Datos</span>
+                <span class="tick violet"><i></i> 09:30 → Modelo</span>
+                <span class="tick"><i></i> 12:00 → Datos</span>
+                <span class="tick violet"><i></i> 12:30 → Modelo</span>
+                <span class="tick"><i></i> 15:00 → Datos</span>
+                <span class="tick violet"><i></i> 15:30 → Modelo</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="footer-note">
+            Diseñado para edición rápida: cambiá horarios/textos en el HTML y listo.
+          </div>
+
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</body>
+</html>
